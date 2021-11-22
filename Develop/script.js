@@ -13,18 +13,18 @@ const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", 
 const months = ["January", "February", "March", "April", "May", "June", 
                 "July", "August", "September", "October", "November", "December"];
 
-setCurrentDateAndHour(); // Set todaysDate, currentDateString, and currentHour, display date in header
-buildTimeBlocks(); // Build rest of html for page
-getTimeEntries(); // See if there are entries in localstorage and load them
+setTodaysDateAndHour(); // Set todaysDate, todaysDateString, and currentHour, display date in header
+TimeBlocks(); // Build time blocks on rest of page
+getTimeEntries(); // Check for entries in localstorage and load them
 
 $(".saveBtn").click(saveClick); // Set event handler for all save buttons
 
 
-// Done when page loads; sets date in header and determines current hour
+// Shows up Date ontop of screen when websites loaded
 function setTodaysDateAndHour() {
-    var today = new Date(); // gets current date
+    var today = new Date(); // gets todays date
     var day = today.getDate();
-    var dayEnd = "th"; // 1st, 2nd, 3rd, 4th, etc.
+    var dayEnd = "th"; 
 
     currentHour = today.getHours(); // current hour, in military format
 
@@ -36,7 +36,7 @@ function setTodaysDateAndHour() {
         todaysDate = today.getFullYear() + months[today.getMonth()] + day;
     }
 
-    // Add correct ending to day; default to initialized value of "th"
+    // Add correct ending to day; default is "th"
     if ((day === 1) || (day === 21) || (day === 31)) {
         dayEnd = "st";
     }
@@ -48,6 +48,41 @@ function setTodaysDateAndHour() {
     }
 
     todaysDateString = days[today.getDay()] + ", " + months[today.getMonth()] + " " + 
-        day + dayEnd + ", " + today.getFullYear(); // date string to display in header
-    $("#currentDay").text(todaysDateString); // set header date
+        day + dayEnd + ", " + today.getFullYear(); 
+    $("#currentDay").text(todaysDateString); 
+}
+
+
+// Creates time blocks
+function TimeBlocks() {
+    var containerDiv = $(".container"); // get the container div to append new rows to
+
+    // Loop through hourMap, from [firstEntry] of "9AM" to [lastEntry] of "5PM"
+    for (let hourBlock=firstEntry; hourBlock <= lastEntry; hourBlock++) {
+        // build the html for the row and the first column
+        var newHtml = '<div class="row time-block"> ' +
+            '<div class="col-md-1 hour">' + hourMap[hourBlock] + '</div> ';
+        
+        // conditionally set second column to corrent class: past, present or future
+        if (hourBlock < currentHour) {
+            newHtml = newHtml + '<textarea class="col-md-10 description past" id="text' + 
+                hourMap[hourBlock] + '"></textarea> ';
+        }
+        else if (hourBlock === currentHour) {
+            newHtml = newHtml + '<textarea class="col-md-10 description present" id="text' + 
+                hourMap[hourBlock] + '"></textarea> ';
+        }
+        else {
+            newHtml = newHtml + '<textarea class="col-md-10 description future" id="text' + 
+                hourMap[hourBlock] + '"></textarea> ';
+        };
+
+        // add last column and close the row div
+        newHtml = newHtml + '<button class="btn saveBtn col-md-1" value="' + hourMap[hourBlock] + '">' +
+            '<i class="fas fa-save"></i></button> ' +
+            '</div>';
+
+        // add new elements to container
+        containerDiv.append(newHtml);
+    }
 }
